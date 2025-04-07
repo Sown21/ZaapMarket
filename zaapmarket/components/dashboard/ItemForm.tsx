@@ -109,7 +109,7 @@ export default function ItemForm() {
           </div>
           
           <div>
-            <label htmlFor="purchasePrice" className="block text-gray-700 mb-2">Prix d&apos;achat (€)</label>
+            <label htmlFor="purchasePrice" className="block text-gray-700 mb-2">Prix d&apos;achat (Kamas)</label>
             <input
               id="purchasePrice"
               name="purchasePrice"
@@ -124,7 +124,7 @@ export default function ItemForm() {
           </div>
           
           <div>
-            <label htmlFor="sellingPrice" className="block text-gray-700 mb-2">Prix de vente (€)</label>
+            <label htmlFor="sellingPrice" className="block text-gray-700 mb-2">Prix de vente (Kamas)</label>
             <input
               id="sellingPrice"
               name="sellingPrice"

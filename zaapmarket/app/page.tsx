@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50">
+    <div className="flex min-h-screen flex-col items-center justify-center p-6">
       <div className="max-w-2xl mx-auto text-center">
-        <h1 className="text-4xl font-bold mb-6">Calculateur de ROI</h1>
+        <h1 className="text-4xl font-bold mb-6">ZaapMarket</h1>
         <p className="mb-8 text-lg">
           Suivez facilement vos investissements et calculez votre retour sur investissement.
         </p>
