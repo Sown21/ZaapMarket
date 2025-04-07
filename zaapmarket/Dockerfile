@@ -1,24 +1,24 @@
-# Étape de build
-FROM node:18-alpine AS builder
+# Utiliser une version LTS stable de Node.js
+FROM node:23.10-alpine
+
+# Désactiver la télémétrie Next.js
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Configurer le répertoire de travail
 WORKDIR /app
+
+# Copier les fichiers de dépendances
 COPY package*.json ./
-RUN npm install
+
+# Installer les dépendances avec cache
+RUN npm install --legacy-peer-deps
+
+# Copier le code source
 COPY . .
+
+# Build de l'application
 RUN npm run build
 
-# Étape de production
-FROM node:18-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-
+# Exposer le port et démarrer l'app
 EXPOSE 3000
-
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-
-CMD ["node", "server.js"] 
+CMD ["npm", "start"]

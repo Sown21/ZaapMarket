@@ -24,6 +24,7 @@ export default function RegisterForm() {
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
 
+    // eslint-disable-next-line prefer-const
     let errorMessage = [];
     if (!minLength) errorMessage.push("8 caractères minimum");
     if (!hasSpecialChar) errorMessage.push("1 caractère spécial");
@@ -106,7 +107,7 @@ export default function RegisterForm() {
             type="text"
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/80"
             required
           />
         </div>
@@ -119,7 +120,7 @@ export default function RegisterForm() {
             type="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/80"
             required
           />
         </div>
@@ -133,7 +134,7 @@ export default function RegisterForm() {
             value={formData.password}
             onChange={handleChange}
             onFocus={() => setIsTypingPassword(true)}
-            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${passwordError && isTypingPassword ? 'border-red-500' : ''}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/80 ${passwordError && isTypingPassword ? 'border-red-500' : ''}`}
             required
           />
           {isTypingPassword && passwordError && (

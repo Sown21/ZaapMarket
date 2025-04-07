@@ -1,16 +1,16 @@
-import { getServerSession } from "next-auth/next";
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+// app/api/items/[id]/route.ts
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { ApiResponse, ItemData } from "@/types";
 import { prisma } from "@/lib/prisma";
 
-const prismaClient = new PrismaClient();
-
+// Version pour Next.js 13/14 avec App Router
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const id = params.id;
+  
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -18,7 +18,7 @@ export async function GET(
     }
 
     const item = await prisma.item.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!item) {
@@ -37,8 +37,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
+  const id = params.id;
+  
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -58,7 +60,7 @@ export async function PUT(
     const roi = ((sellingPrice - purchasePrice) / purchasePrice) * 100;
 
     const updatedItem = await prisma.item.update({
-      where: { id: context.params.id },
+      where: { id },
       data: {
         name,
         purchasePrice,
@@ -81,6 +83,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const id = params.id;
+  
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -88,7 +92,7 @@ export async function DELETE(
     }
 
     await prisma.item.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "Item supprimé avec succès" });
@@ -99,4 +103,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}
