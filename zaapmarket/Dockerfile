@@ -1,3 +1,5 @@
+FROM node:23.10.0 AS build
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
