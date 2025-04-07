@@ -3,12 +3,13 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ItemFormData } from "@/types";
+import { formatNumber } from "@/lib/utils";
 
 export default function ItemForm() {
   const [formData, setFormData] = useState<ItemFormData>({
     name: "",
-    purchasePrice: 0,
-    sellingPrice: 0,
+    purchasePrice: BigInt(0),
+    sellingPrice: BigInt(0),
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -16,16 +17,18 @@ export default function ItemForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    // Supprimer les espaces pour le traitement
+    const cleanValue = value.replace(/\s/g, '');
     setFormData(prev => ({
       ...prev,
-      [name]: name === "name" ? value : parseFloat(value) || 0
+      [name]: name === "name" ? value : BigInt(Math.floor(parseFloat(cleanValue) || 0))
     }));
   };
 
-  const calculateROI = (purchase: number, selling: number): number => {
-    if (purchase <= 0) return 0;
-    const profit = selling - purchase;
-    return (profit / purchase) * 100;
+  const calculateROI = (purchase: bigint, selling: bigint): number => {
+    if (purchase <= BigInt(0)) return 0;
+    const profit = Number(selling - purchase);
+    return (profit / Number(purchase)) * 100;
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -35,7 +38,7 @@ export default function ItemForm() {
 
     const { name, purchasePrice, sellingPrice } = formData;
 
-    if (!name || purchasePrice <= 0 || sellingPrice <= 0) {
+    if (!name || purchasePrice <= BigInt(0) || sellingPrice <= BigInt(0)) {
       setError("Veuillez remplir tous les champs avec des valeurs valides");
       setLoading(false);
       return;
@@ -51,8 +54,8 @@ export default function ItemForm() {
         },
         body: JSON.stringify({
           name,
-          purchasePrice,
-          sellingPrice,
+          purchasePrice: purchasePrice.toString(),
+          sellingPrice: sellingPrice.toString(),
           roi
         })
       });
@@ -66,8 +69,8 @@ export default function ItemForm() {
       // Réinitialiser le formulaire
       setFormData({
         name: "",
-        purchasePrice: 0,
-        sellingPrice: 0
+        purchasePrice: BigInt(0),
+        sellingPrice: BigInt(0)
       });
       
       // Rafraîchir les données
@@ -113,10 +116,10 @@ export default function ItemForm() {
             <input
               id="purchasePrice"
               name="purchasePrice"
-              type="number"
-              step="0.01"
-              min="0.01"
-              value={formData.purchasePrice || ""}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9\s]*"
+              value={formatNumber(formData.purchasePrice)}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
@@ -128,10 +131,10 @@ export default function ItemForm() {
             <input
               id="sellingPrice"
               name="sellingPrice"
-              type="number"
-              step="0.01"
-              min="0.01"
-              value={formData.sellingPrice || ""}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9\s]*"
+              value={formatNumber(formData.sellingPrice)}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required

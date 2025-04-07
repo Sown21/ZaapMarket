@@ -17,13 +17,13 @@ model User {
 }
 
 model Item {
-  id          String   @id @default(uuid())
-  name        String
-  purchasePrice Float
-  sellingPrice Float
-  roi         Float
-  userId      String   // Foreign key to the User model
-  user        User     @relation(fields: [userId], references: [id]) // Relation to the User model
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(uuid())
+  name          String
+  purchasePrice BigInt
+  sellingPrice  BigInt
+  roi           Float
+  userId        String   // Foreign key to the User model
+  user          User     @relation(fields: [userId], references: [id]) // Relation to the User model
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

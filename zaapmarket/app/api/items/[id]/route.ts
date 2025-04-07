@@ -30,8 +30,15 @@ export async function GET(
       );
     }
 
-    return NextResponse.json<ApiResponse<ItemData>>(
-      { success: true, data: item }
+    // Convertir les BigInt en string pour la réponse JSON
+    const itemResponse = {
+      ...item,
+      purchasePrice: item.purchasePrice.toString(),
+      sellingPrice: item.sellingPrice.toString()
+    };
+
+    return NextResponse.json<ApiResponse<typeof itemResponse>>(
+      { success: true, data: itemResponse }
     );
   } catch (error) {
     console.error("[ITEMS_GET]", error);
@@ -61,28 +68,38 @@ export async function PUT(
     const body = await request.json();
     const { name, purchasePrice, sellingPrice } = body;
 
-    if (!name || typeof purchasePrice !== "number" || typeof sellingPrice !== "number") {
+    if (!name || !purchasePrice || !sellingPrice) {
       return NextResponse.json<ApiResponse<null>>(
         { success: false, message: "Données invalides" },
         { status: 400 }
       );
     }
 
-    const roi = ((sellingPrice - purchasePrice) / purchasePrice) * 100;
+    const purchasePriceBigInt = BigInt(purchasePrice);
+    const sellingPriceBigInt = BigInt(sellingPrice);
+
+    const roi = ((Number(sellingPriceBigInt) - Number(purchasePriceBigInt)) / Number(purchasePriceBigInt)) * 100;
 
     const updatedItem = await prisma.item.update({
       where: { id: context.params.id },
       data: {
         name,
-        purchasePrice,
-        sellingPrice,
+        purchasePrice: purchasePriceBigInt,
+        sellingPrice: sellingPriceBigInt,
         roi,
         userId: session.user.id
       },
     });
 
-    return NextResponse.json<ApiResponse<ItemData>>(
-      { success: true, data: updatedItem }
+    // Convertir les BigInt en string pour la réponse JSON
+    const itemResponse = {
+      ...updatedItem,
+      purchasePrice: updatedItem.purchasePrice.toString(),
+      sellingPrice: updatedItem.sellingPrice.toString()
+    };
+
+    return NextResponse.json<ApiResponse<typeof itemResponse>>(
+      { success: true, data: itemResponse }
     );
   } catch (error) {
     console.error("[ITEMS_PUT]", error);

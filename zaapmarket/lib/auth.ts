@@ -66,6 +66,14 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
       }
       return token;
+    },
+    async redirect({ url }) {
+      // Si c'est une URL de déconnexion
+      if (url.includes('signout')) {
+        return 'https://zaapmarket.sown.ovh/';
+      }
+      // Pour la connexion et autres cas, rediriger vers le dashboard
+      return 'https://zaapmarket.sown.ovh/';
     }
   }
 };

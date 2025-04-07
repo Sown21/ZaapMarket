@@ -14,8 +14,8 @@ export interface Session {
 export interface ItemData {
   id: string;
   name: string;
-  purchasePrice: number;
-  sellingPrice: number;
+  purchasePrice: bigint;
+  sellingPrice: bigint;
   roi: number;
   createdAt: Date;
   updatedAt: Date;
@@ -23,8 +23,8 @@ export interface ItemData {
 
 export interface ItemFormData {
   name: string;
-  purchasePrice: number;
-  sellingPrice: number;
+  purchasePrice: bigint;
+  sellingPrice: bigint;
 }
 
 export interface RegisterFormData {

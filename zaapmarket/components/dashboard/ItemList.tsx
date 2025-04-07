@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ItemData } from "@/types";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { formatNumber } from "@/lib/utils";
 
 interface ItemListProps {
   items: ItemData[];
@@ -15,7 +16,7 @@ export default function ItemList({ items }: ItemListProps) {
   const [editedData, setEditedData] = useState<Partial<ItemData>>({});
   const [error, setError] = useState<string>("");
 
-  const calculateProfit = (purchasePrice: number, sellingPrice: number): number => {
+  const calculateProfit = (purchasePrice: bigint, sellingPrice: bigint): bigint => {
     return sellingPrice - purchasePrice;
   };
 
@@ -41,7 +42,11 @@ export default function ItemList({ items }: ItemListProps) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(editedData)
+        body: JSON.stringify({
+          ...editedData,
+          purchasePrice: editedData.purchasePrice?.toString(),
+          sellingPrice: editedData.sellingPrice?.toString()
+        })
       });
 
       const data = await response.json();
@@ -64,10 +69,15 @@ export default function ItemList({ items }: ItemListProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    const cleanValue = value.replace(/\s/g, '');
     setEditedData(prev => ({
       ...prev,
-      [name]: name === "name" ? value : parseFloat(value) || 0
+      [name]: name === "name" ? value : BigInt(Math.floor(parseFloat(cleanValue) || 0))
     }));
+  };
+
+  const handleSignOut = () => {
+    signOut();
   };
 
   return (
@@ -114,38 +124,41 @@ export default function ItemList({ items }: ItemListProps) {
                   <td className="px-4 py-3">
                     {editingItem === item.id ? (
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9\s]*"
                         name="purchasePrice"
-                        value={editedData.purchasePrice}
+                        value={formatNumber(editedData.purchasePrice || BigInt(0))}
                         onChange={handleChange}
-                        step="0.01"
-                        min="0.01"
                         className="w-full px-2 py-1 border rounded"
                       />
                     ) : (
-                      `${item.purchasePrice.toFixed(2)} Kamas`
+                      `${formatNumber(item.purchasePrice)} Kamas`
                     )}
                   </td>
                   <td className="px-4 py-3">
                     {editingItem === item.id ? (
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9\s]*"
                         name="sellingPrice"
-                        value={editedData.sellingPrice}
+                        value={formatNumber(editedData.sellingPrice || BigInt(0))}
                         onChange={handleChange}
-                        step="0.01"
-                        min="0.01"
                         className="w-full px-2 py-1 border rounded"
                       />
                     ) : (
-                      `${item.sellingPrice.toFixed(2)} Kamas`
+                      `${formatNumber(item.sellingPrice)} Kamas`
                     )}
                   </td>
-                  <td className={`px-4 py-3 font-medium ${calculateProfit(item.purchasePrice, item.sellingPrice) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <td className="px-4 py-3">
                     {editingItem === item.id ? (
-                      `${calculateProfit(editedData.purchasePrice || 0, editedData.sellingPrice || 0).toFixed(2)} Kamas`
+                      `${formatNumber(calculateProfit(
+                        editedData.purchasePrice || BigInt(0),
+                        editedData.sellingPrice || BigInt(0)
+                      ))} Kamas`
                     ) : (
-                      `${calculateProfit(item.purchasePrice, item.sellingPrice).toFixed(2)} Kamas`
+                      `${formatNumber(calculateProfit(item.purchasePrice, item.sellingPrice))} Kamas`
                     )}
                   </td>
                   <td className={`px-4 py-3 font-medium ${item.roi > 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -182,9 +195,10 @@ export default function ItemList({ items }: ItemListProps) {
           </table>
         </div>
       )}
+      
       <button
         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4"
-        onClick={() => signOut()}
+        onClick={handleSignOut}
       >
         Déconnexion
       </button>

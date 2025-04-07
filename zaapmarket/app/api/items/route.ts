@@ -21,29 +21,39 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, purchasePrice, sellingPrice } = body;
     
-    if (!name || typeof purchasePrice !== "number" || typeof sellingPrice !== "number") {
+    if (!name || !purchasePrice || !sellingPrice) {
       return NextResponse.json<ApiResponse<null>>(
         { success: false, message: "Données invalides" },
         { status: 400 }
       );
     }
 
+    const purchasePriceBigInt = BigInt(purchasePrice);
+    const sellingPriceBigInt = BigInt(sellingPrice);
+
     // Calcul automatique du ROI
-    const roi = ((sellingPrice - purchasePrice) / purchasePrice) * 100;
+    const roi = ((Number(sellingPriceBigInt) - Number(purchasePriceBigInt)) / Number(purchasePriceBigInt)) * 100;
 
     // Création de l'item avec typage sécurisé
     const item = await prisma.item.create({
       data: {
         name,
-        purchasePrice,
-        sellingPrice,
+        purchasePrice: purchasePriceBigInt,
+        sellingPrice: sellingPriceBigInt,
         roi,
         userId: (session.user as SessionUser).id // Cast explicite
       }
     });
 
-    return NextResponse.json<ApiResponse<ItemData>>(
-      { success: true, data: item },
+    // Convertir les BigInt en string pour la réponse JSON
+    const itemResponse = {
+      ...item,
+      purchasePrice: item.purchasePrice.toString(),
+      sellingPrice: item.sellingPrice.toString()
+    };
+
+    return NextResponse.json<ApiResponse<typeof itemResponse>>(
+      { success: true, data: itemResponse },
       { status: 201 }
     );
   } catch (error) {
@@ -78,8 +88,15 @@ export async function GET(request: NextRequest) { // Paramètre request ajouté
       }
     });
 
-    return NextResponse.json<ApiResponse<ItemData[]>>(
-      { success: true, data: items }
+    // Convertir les BigInt en string pour la réponse JSON
+    const itemsResponse = items.map(item => ({
+      ...item,
+      purchasePrice: item.purchasePrice.toString(),
+      sellingPrice: item.sellingPrice.toString()
+    }));
+
+    return NextResponse.json<ApiResponse<typeof itemsResponse>>(
+      { success: true, data: itemsResponse }
     );
   } catch (error) {
     console.error('[ITEMS_GET]', error);
