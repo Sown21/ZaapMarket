@@ -13,6 +13,8 @@ declare global {
   }
 }
 
+const GA_MEASUREMENT_ID = 'G-KHJB9562FV';
+
 export default function Home() {
   const router = useRouter();
   const pathname = usePathname();
@@ -27,39 +29,26 @@ export default function Home() {
       }
     };
     checkAuth();
-
-    // Initialiser dataLayer
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(){window.dataLayer.push(arguments);}
-
-    // Track page view
-    window.dataLayer.push(['js', new Date()]);
-    window.dataLayer.push(['config', 'G-KHJB9562FV', {
-      page_path: pathname,
-    }]);
-  }, [router, pathname]);
+  }, [router]);
 
   return (
     <>
       <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=G-KHJB9562FV`}
       />
-      <Script
-        id="google-analytics"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-KHJB9562FV', {
-              page_path: window.location.pathname,
-            });
-          `,
-        }}
-      />
-      <div className="flex min-h-screen flex-col items-center justify-center p-6">
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_MEASUREMENT_ID}', {
+            page_path: '${pathname}',
+            debug_mode: true
+          });
+        `}
+      </Script>
+      <div className="min-h-screen bg-gradient-to-b from-[#222222] to-[#111111] text-white">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl font-bold mb-8">ZaapMarket</h1>
