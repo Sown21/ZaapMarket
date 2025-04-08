@@ -48,7 +48,7 @@ export default function Home() {
           });
         `}
       </Script>
-      <div className="min-h-screen bg-gradient-to-b from-[#222222] to-[#111111] text-white">
+      <div className="flex min-h-screen flex-col items-center justify-center p-6">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl font-bold mb-8">ZaapMarket</h1>
