@@ -15,6 +15,7 @@ export default function ItemList({ items }: ItemListProps) {
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editedData, setEditedData] = useState<Partial<ItemData>>({});
   const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const calculateProfit = (purchasePrice: bigint, sellingPrice: bigint): bigint => {
     return sellingPrice - purchasePrice;
@@ -37,6 +38,7 @@ export default function ItemList({ items }: ItemListProps) {
 
   const handleSave = async (itemId: string) => {
     try {
+      setLoading(true);
       const response = await fetch(`/api/items/${itemId}`, {
         method: "PUT",
         headers: {
@@ -64,6 +66,8 @@ export default function ItemList({ items }: ItemListProps) {
       } else {
         setError("Une erreur inconnue est survenue");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,6 +84,26 @@ export default function ItemList({ items }: ItemListProps) {
     signOut();
   };
 
+  const handleDelete = async (itemId: string) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet item ?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/items/${itemId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression");
+      }
+
+      router.refresh();
+    } catch (e) {
+      setError("Une erreur est survenue lors de la suppression");
+    }
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md backdrop-blur-xl bg-white/55">
       <h3 className="text-xl font-semibold mb-4">Mes items</h3>
@@ -90,7 +114,9 @@ export default function ItemList({ items }: ItemListProps) {
         </div>
       )}
 
-      {items.length === 0 ? (
+      {loading ? (
+        <div>Chargement...</div>
+      ) : items.length === 0 ? (
         <p className="text-gray-500">Aucun item ajouté pour le moment.</p>
       ) : (
         <div className="overflow-x-auto">
@@ -181,12 +207,20 @@ export default function ItemList({ items }: ItemListProps) {
                         </button>
                       </div>
                     ) : (
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm"
-                      >
-                        Modifier
-                      </button>
+                      <div className="space-x-2">
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -195,13 +229,6 @@ export default function ItemList({ items }: ItemListProps) {
           </table>
         </div>
       )}
-      
-      <button
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4"
-        onClick={handleSignOut}
-      >
-        Déconnexion
-      </button>
     </div>
   );
 }

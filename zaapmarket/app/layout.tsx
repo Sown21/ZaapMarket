@@ -28,7 +28,12 @@ export default function RootLayout({
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-KHJB9562FV');
+              gtag('config', 'G-KHJB9562FV', {
+                send_page_view: true,
+                cookie_domain: 'zaapmarket.sown.ovh',
+                user_id: undefined,
+                debug_mode: true
+              });
             `,
           }}
         />
