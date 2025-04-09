@@ -43,7 +43,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} antialiased`}>
-        <div className="min-h-screen bg-gradient-to-br from-[#9EC743] to-[#18283F]">
+        <div className="min-h-screen bg-gradient-to-br from-[#18283F] to-[#00BAE7]">
           {children}
         </div>
       </body>
